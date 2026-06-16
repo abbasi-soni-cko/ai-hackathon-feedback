@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Hackathon Feedback</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f7;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      color: #1d1d1f;
+    }
+
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .header {
+      background: #fff;
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 1rem;
+      border-top: 6px solid #534AB7;
+    }
+
+    .header h1 {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .header p {
+      font-size: 14px;
+      color: #6e6e73;
+      line-height: 1.6;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .card h2 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .card .hint {
+      font-size: 13px;
+      color: #6e6e73;
+      margin-bottom: 1rem;
+    }
+
+    .rating-row {
+      margin-bottom: 1.5rem;
+    }
+
+    .rating-label {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .rating-label .score-badge {
+      font-size: 13px;
+      font-weight: 600;
+      color: #534AB7;
+      background: #EEEDFE;
+      border-radius: 20px;
+      padding: 2px 10px;
+      min-width: 32px;
+      text-align: center;
+    }
+
+    .stars {
+      display: flex;
+      gap: 8px;
+    }
+
+    .stars input[type="radio"] { display: none; }
+
+    .stars label {
+      cursor: pointer;
+      font-size: 28px;
+      color: #d1d1d6;
+      transition: color 0.15s;
+      line-height: 1;
+    }
+
+    .stars input[type="radio"]:checked ~ label,
+    .stars label:hover,
+    .stars label:hover ~ label { color: #d1d1d6; }
+
+    .stars label:hover,
+    .stars input[type="radio"]:checked + label,
+    .star-group:hover .stars label { color: #534AB7; }
+
+    .star-group { display: flex; flex-direction: row-reverse; }
+    .star-group label:hover,
+    .star-group label:hover ~ label,
+    .star-group input:checked ~ label { color: #534AB7; }
+    .star-group label { color: #d1d1d6; font-size: 30px; cursor: pointer; padding: 0 3px; }
+
+    .scale-hint {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #8e8e93;
+      margin-top: 4px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 0.75rem 1rem;
+      border: 1px solid #d1d1d6;
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: inherit;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+      color: #1d1d1f;
+    }
+
+    textarea:focus { border-color: #534AB7; }
+
+    input[type="text"],
+    input[type="email"] {
+      width: 100%;
+      padding: 0.65rem 1rem;
+      border: 1px solid #d1d1d6;
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+      color: #1d1d1f;
+      background: #fff;
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus { border-color: #534AB7; }
+
+    .field-group { margin-bottom: 1rem; }
+    .field-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: #3a3a3c;
+    }
+    .field-group .optional {
+      font-weight: 400;
+      color: #8e8e93;
+      margin-left: 4px;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 0.85rem;
+      background: #534AB7;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 0.5rem;
+    }
+
+    .submit-btn:hover { background: #3C3489; }
+    .submit-btn:active { transform: scale(0.98); }
+    .submit-btn:disabled { background: #8e8e93; cursor: not-allowed; }
+
+    .success-msg {
+      display: none;
+      background: #EAF3DE;
+      border: 1px solid #97C459;
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    .success-msg h3 { color: #3B6D11; font-size: 18px; margin-bottom: 0.5rem; }
+    .success-msg p { color: #639922; font-size: 14px; }
+
+    .error-msg {
+      display: none;
+      background: #FCEBEB;
+      border: 1px solid #F09595;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 13px;
+      color: #A32D2D;
+      margin-top: 0.75rem;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #f2f2f7;
+      margin: 1rem 0;
+    }
+
+    .required-star { color: #E24B4A; margin-left: 2px; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>AI Hackathon — Feedback Form</h1>
+    <p>Thank you for participating! Please share your honest ratings and feedback to help us improve future events. All fields marked <span style="color:#E24B4A">*</span> are required.</p>
+  </div>
+
+  <form id="feedbackForm">
+
+    <!-- Ratings card -->
+    <div class="card">
+      <h2>Rate the hackathon</h2>
+      <p class="hint">1 = Below average &nbsp;·&nbsp; 5 = Top class</p>
+
+      <!-- Criterion 1 -->
+      <div class="rating-row">
+        <div class="rating-label">
+          Event Planning <span class="required-star">*</span>
+          <span class="score-badge" id="badge-1">—</span>
+        </div>
+        <div class="star-group" id="stars-1">
+          <input type="radio" name="planning" id="pl5" value="5"><label for="pl5">&#9733;</label>
+          <input type="radio" name="planning" id="pl4" value="4"><label for="pl4">&#9733;</label>
+          <input type="radio" name="planning" id="pl3" value="3"><label for="pl3">&#9733;</label>
+          <input type="radio" name="planning" id="pl2" value="2"><label for="pl2">&#9733;</label>
+          <input type="radio" name="planning" id="pl1" value="1"><label for="pl1">&#9733;</label>
+        </div>
+        <div class="scale-hint"><span>1 — Below average</span><span>5 — Top class</span></div>
+      </div>
+
+      <hr class="divider">
+
+      <!-- Criterion 2 -->
+      <div class="rating-row">
+        <div class="rating-label">
+          Impact &amp; Use Case <span class="required-star">*</span>
+          <span class="score-badge" id="badge-2">—</span>
+        </div>
+        <div class="star-group" id="stars-2">
+          <input type="radio" name="impact" id="im5" value="5"><label for="im5">&#9733;</label>
+          <input type="radio" name="impact" id="im4" value="4"><label for="im4">&#9733;</label>
+          <input type="radio" name="impact" id="im3" value="3"><label for="im3">&#9733;</label>
+          <input type="radio" name="impact" id="im2" value="2"><label for="im2">&#9733;</label>
+          <input type="radio" name="impact" id="im1" value="1"><label for="im1">&#9733;</label>
+        </div>
+        <div class="scale-hint"><span>1 — Below average</span><span>5 — Top class</span></div>
+      </div>
+
+      <hr class="divider">
+
+      <!-- Criterion 3 -->
+      <div class="rating-row">
+        <div class="rating-label">
+          Learning Impact <span class="required-star">*</span>
+          <span class="score-badge" id="badge-3">—</span>
+        </div>
+        <div class="star-group" id="stars-3">
+          <input type="radio" name="learning" id="ln5" value="5"><label for="ln5">&#9733;</label>
+          <input type="radio" name="learning" id="ln4" value="4"><label for="ln4">&#9733;</label>
+          <input type="radio" name="learning" id="ln3" value="3"><label for="ln3">&#9733;</label>
+          <input type="radio" name="learning" id="ln2" value="2"><label for="ln2">&#9733;</label>
+          <input type="radio" name="learning" id="ln1" value="1"><label for="ln1">&#9733;</label>
+        </div>
+        <div class="scale-hint"><span>1 — Below average</span><span>5 — Top class</span></div>
+      </div>
+
+      <hr class="divider">
+
+      <!-- Criterion 4 -->
+      <div class="rating-row" style="margin-bottom:0">
+        <div class="rating-label">
+          Overall Event Experience <span class="required-star">*</span>
+          <span class="score-badge" id="badge-4">—</span>
+        </div>
+        <div class="star-group" id="stars-4">
+          <input type="radio" name="overall" id="ov5" value="5"><label for="ov5">&#9733;</label>
+          <input type="radio" name="overall" id="ov4" value="4"><label for="ov4">&#9733;</label>
+          <input type="radio" name="overall" id="ov3" value="3"><label for="ov3">&#9733;</label>
+          <input type="radio" name="overall" id="ov2" value="2"><label for="ov2">&#9733;</label>
+          <input type="radio" name="overall" id="ov1" value="1"><label for="ov1">&#9733;</label>
+        </div>
+        <div class="scale-hint"><span>1 — Below average</span><span>5 — Top class</span></div>
+      </div>
+    </div>
+
+    <!-- Feedback text -->
+    <div class="card">
+      <h2>Written feedback <span class="required-star">*</span></h2>
+      <p class="hint" style="margin-bottom:0.75rem">What did you love? What could be better?</p>
+      <textarea name="feedback" id="feedback" placeholder="Share your thoughts, suggestions, or highlights from the hackathon…"></textarea>
+    </div>
+
+    <!-- Identity (optional) -->
+    <div class="card">
+      <h2>Your details <span style="font-weight:400; color:#8e8e93; font-size:13px">(optional)</span></h2>
+      <p class="hint" style="margin-bottom:1rem">We will only use this to follow up if needed.</p>
+      <div class="field-group">
+        <label for="name">Full name <span class="optional">(optional)</span></label>
+        <input type="text" id="name" name="name" placeholder="Jane Smith" autocomplete="name" />
+      </div>
+      <div class="field-group" style="margin-bottom:0">
+        <label for="email">Email address <span class="optional">(optional)</span></label>
+        <input type="email" id="email" name="email" placeholder="jane@example.com" autocomplete="email" />
+      </div>
+    </div>
+
+    <div class="error-msg" id="errorMsg">Please complete all required ratings and written feedback before submitting.</div>
+
+    <button type="submit" class="submit-btn" id="submitBtn">Submit feedback</button>
+
+    <div class="success-msg" id="successMsg">
+      <h3>Thank you!</h3>
+      <p>Your feedback has been recorded. We appreciate your time.</p>
+    </div>
+
+  </form>
+</div>
+
+<script>
+  const SHEET_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE";
+
+  const badgeMap = {
+    planning: "badge-1",
+    impact:   "badge-2",
+    learning: "badge-3",
+    overall:  "badge-4"
+  };
+
+  document.querySelectorAll('input[type="radio"]').forEach(radio => {
+    radio.addEventListener("change", () => {
+      const badge = document.getElementById(badgeMap[radio.name]);
+      if (badge) badge.textContent = radio.value;
+    });
+  });
+
+  document.getElementById("feedbackForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+    const form = e.target;
+    const errorMsg = document.getElementById("errorMsg");
+    const successMsg = document.getElementById("successMsg");
+    const submitBtn = document.getElementById("submitBtn");
+
+    const getValue = name => {
+      const checked = form.querySelector(`input[name="${name}"]:checked`);
+      return checked ? checked.value : "";
+    };
+
+    const planning  = getValue("planning");
+    const impact    = getValue("impact");
+    const learning  = getValue("learning");
+    const overall   = getValue("overall");
+    const feedback  = document.getElementById("feedback").value.trim();
+
+    if (!planning || !impact || !learning || !overall || !feedback) {
+      errorMsg.style.display = "block";
+      errorMsg.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+    errorMsg.style.display = "none";
+
+    const payload = {
+      timestamp: new Date().toISOString(),
+      planning,
+      impact,
+      learning,
+      overall,
+      feedback,
+      name:  document.getElementById("name").value.trim(),
+      email: document.getElementById("email").value.trim()
+    };
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Submitting…";
+
+    try {
+      await fetch(SHEET_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      form.style.display = "none";
+      successMsg.style.display = "block";
+    } catch (err) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Submit feedback";
+      errorMsg.textContent = "Submission failed. Please try again.";
+      errorMsg.style.display = "block";
+    }
+  });
+</script>
+</body>
+</html>
